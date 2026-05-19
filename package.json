@@ -21,6 +21,8 @@
   },
   "homepage": "https://github.com/alejop0927/RitmovivoBackend#readme",
   "dependencies": {
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
     "@supabase/supabase-js": "^2.105.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
@@ -28,6 +30,8 @@
     "express": "^5.2.1",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
+    "prisma": "^7.8.0",
+    "socket.io": "^4.8.3",
     "zod": "^4.3.6"
   },
   "devDependencies": {

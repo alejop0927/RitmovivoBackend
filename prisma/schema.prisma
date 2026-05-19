@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Usuario {
+  id            String        @id @default(uuid())
+  nombre        String
+  apellido      String
+  email         String        @unique
+  password_hash String
+  telefono      String?
+  rol           String        @default("estudiante")
+  created_at    DateTime      @default(now())
+  inscripciones Inscripcion[]
+  reservas      Reserva[]
+  feedbacks     Feedback[]
+  instructor    Instructor?
+
+  @@map("usuarios")
+}
+
+model Instructor {
+  id           String    @id @default(uuid())
+  usuario_id   String?   @unique
+  nombre       String
+  apellido     String
+  especialidad String[]
+  bio          String?
+  experiencia  Int       @default(0)
+  rating       Float     @default(0)
+  usuario      Usuario?  @relation(fields: [usuario_id], references: [id])
+  clases       Clase[]
+  horarios     Horario[]
+
+  @@map("instructores")
+}
+
+model Clase {
+  id            String      @id @default(uuid())
+  nombre        String
+  descripcion   String?
+  nivel         String
+  instructor_id String?
+  duracion      Int
+  capacidad     Int
+  inscritos     Int         @default(0)
+  estilo        String
+  instructor    Instructor? @relation(fields: [instructor_id], references: [id])
+  horarios      Horario[]
+  feedbacks     Feedback[]
+
+  @@map("clases")
+}
+
+model Horario {
+  id            String        @id @default(uuid())
+  clase_id      String
+  instructor_id String?
+  fecha         DateTime      @db.Date
+  hora_inicio   String
+  hora_fin      String
+  salon         String
+  disponible    Boolean       @default(true)
+  clase         Clase         @relation(fields: [clase_id], references: [id])
+  instructor    Instructor?   @relation(fields: [instructor_id], references: [id])
+  inscripciones Inscripcion[]
+  reservas      Reserva[]
+
+  @@map("horarios")
+}
+
+model Inscripcion {
+  id         String   @id @default(uuid())
+  usuario_id String
+  horario_id String
+  estado     String   @default("pendiente") // pendiente, activa, cancelada, completada
+  created_at DateTime @default(now())
+  usuario    Usuario  @relation(fields: [usuario_id], references: [id])
+  horario    Horario  @relation(fields: [horario_id], references: [id])
+
+  @@map("inscripciones")
+}
+
+model Reserva {
+  id              String   @id @default(uuid())
+  usuario_id      String
+  horario_id      String?   // Opcional: si la reserva es para una clase existente
+  salon           String?   // Para reserva libre (nombre del salón/espacio)
+  fecha           DateTime? // Para reserva libre (fecha de la reserva)
+  hora_inicio     String?   // Para reserva libre (hora inicio)
+  hora_fin        String?   // Para reserva libre (hora fin)
+  numero_personas Int      @default(1)
+  con_profesor    Boolean  @default(false)
+  estado          String   @default("pendiente") // pendiente, confirmada, cancelada
+  created_at      DateTime @default(now())
+  usuario         Usuario  @relation(fields: [usuario_id], references: [id])
+  horario         Horario? @relation(fields: [horario_id], references: [id])
+
+  @@map("reservas")
+}
+
+model Feedback {
+  id         String   @id @default(uuid())
+  usuario_id String
+  clase_id   String
+  puntuacion Int
+  comentario String?
+  created_at DateTime @default(now())
+  usuario    Usuario  @relation(fields: [usuario_id], references: [id])
+  clase      Clase    @relation(fields: [clase_id], references: [id])
+
+  @@map("feedback")
+}
